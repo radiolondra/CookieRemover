@@ -1,0 +1,54 @@
+﻿{
+  "manifest_version": 3,
+  "name": "Cookie Remover",
+  "description": "Cookie Remover built with Blazor WebAssembly",
+  "version": "0.1",
+
+  "background": {
+    "service_worker": "BackgroundWorker.js",
+    "type": "module"
+  },
+
+  "action": {
+    "default_popup": "popup.html"
+  },
+
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+
+  "content_scripts": [
+    {
+      "matches": [ "*://*/*" ],
+      "js": [
+        "content/BlazorStrap/popper.min.js",
+        "content/BlazorStrap/blazorstrap.js"
+      ],
+      "css": [
+        "CookieRemover.styles.css",
+        "css/bootstrap/bootstrap.min.css"
+      ]
+    }
+  ],
+
+  "permissions": [ "scripting", "storage", "unlimitedStorage", "tabs", "webRequest", "cookies", "nativeMessaging", "activeTab" ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+
+  "host_permissions": [
+    "*://*/*"
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "framework/*",
+        "content/*"
+      ],
+      "matches": [ "<all_urls>" ]
+    }
+  ]
+}

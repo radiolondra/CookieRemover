@@ -1,0 +1,6 @@
+@import '_content/BlazorStrap/BlazorStrap.bundle.scp.css';
+
+/* /Shared/MainLayout.razor.rz.scp.css */
+body[b-wazazjrveh] {
+    background-color: #f8f9fa;
+}
