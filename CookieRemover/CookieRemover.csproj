@@ -16,4 +16,9 @@
     <None Include="wwwroot\**\*" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\js\Functions.js" />
+    <Content Remove="wwwroot\js\ScriptContent.js" />
+  </ItemGroup>
+
 </Project>

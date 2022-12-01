@@ -1,4 +1,39 @@
 ﻿@page "/popup.html"
 @inherits BasePage
+@inject IJSRuntime js
 
-<h1>My popup page</h1>
+<div style="min-width:800px;">
+    <BSContainer Container="Container.Large">
+
+        <BSRow Align="Align.Center" Padding="Padding.Medium">
+            <BSCol>
+                <h3>Cookies Extension Popup</h3>
+            </BSCol>        
+        </BSRow>
+            
+        <BSRow Align="Align.Start" Padding="Padding.Small">
+            <BSCol>
+                <BSButton OnClick="@OpenSettings_DeleteCookies" Color="BSColor.Primary">Open Browser Settings Page (Delete Cookies)</BSButton>
+            </BSCol>
+        </BSRow>
+
+        <BSRow Align="Align.Start" Padding="Padding.Small">
+            <BSCol>
+                <BSButton OnClick="@OpenExtensionPage" Color="BSColor.Primary">Open Browser Extensions Page</BSButton>
+            </BSCol>
+        </BSRow>
+
+    </BSContainer>
+</div>
+
+@code{
+    private async Task OpenSettings_DeleteCookies()
+    {
+        await js.InvokeVoidAsync("gotoSettingsPage_DeleteCookies");
+    }
+
+    private async Task OpenExtensionPage()
+    {
+        await js.InvokeVoidAsync("gotoExtensionPage");
+    }
+}

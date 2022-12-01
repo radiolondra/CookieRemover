@@ -2,6 +2,14 @@
   "manifest_version": 3,
   "name": "Cookie Remover",
   "description": "Cookie Remover built with Blazor WebAssembly",
+  "icons": {
+    "128": "assets/settings-128.png",
+    "16": "assets/settings-16.png",
+    "256": "assets/settings-256.png",
+    "32": "assets/settings-32.png",
+    "48": "assets/settings-48.png",
+    "64": "assets/settings-64.png"
+  },
   "version": "0.1",
 
   "background": {
@@ -10,6 +18,16 @@
   },
 
   "action": {
+    "default_icon": {
+      "128": "assets/settings-128.png",
+      "16": "assets/settings-16.png",
+      "256": "assets/settings-256.png",
+      "32": "assets/settings-32.png",
+      "48": "assets/settings-48.png",
+      "512": "assets/settings-512.png",
+      "64": "assets/settings-64.png",
+      "96": "assets/settings-96.png"
+    },
     "default_popup": "popup.html"
   },
 
@@ -23,7 +41,8 @@
       "matches": [ "*://*/*" ],
       "js": [
         "content/BlazorStrap/popper.min.js",
-        "content/BlazorStrap/blazorstrap.js"
+        "content/BlazorStrap/blazorstrap.js",
+        "js/ScriptContent.js"
       ],
       "css": [
         "CookieRemover.styles.css",
