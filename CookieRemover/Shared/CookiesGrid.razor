@@ -1,27 +1,39 @@
 ﻿@page "/CookiesGrid.html"
 @using CookieExtension.Models;
 @inherits BasePage
+@inject IJSRuntime js
 
-<BSModal 
+@* Cookies Grid in modal *@
+<BSModal     
     @ref="Modal" 
     DataId="modal01" 
     IsCentered="true" 
     IsScrollable=true 
-    IsStaticBackdrop=true 
-    ShowBackdrop=true 
-    OnShow="ClearGrid"
+    IsStaticBackdrop=false 
+    ShowBackdrop=true    
+    OnShow="ClearCookieGrid"    
     Size="Size.ExtraLarge">
 
-    <Header>Browser Cookies : @content</Header>
-    <Content>
+    <Header>
+        <BSContainer>
+        <BSRow>
+            <BSCol ColumnSmall="8">
+                <BSLabel style="color:darkblue"><h5>Browser Cookies</h5></BSLabel>
+            </BSCol>
+            <BSCol ColumnSmall="4" Align="Align.End">
+                <BSLabel><h6>@cc.content @cc.selected</h6></BSLabel>
+            </BSCol>            
+        </BSRow>
+        </BSContainer>
+    </Header>
 
+    <Content>
         
         <div class="@BS.Input_Group mb-3">
             <span class="@BS.Input_Group_Text">Custom Filter</span>  
-            <BSInput InputType="InputType.Text" placeholder="By domain" Value="cc._customFilter" ValueChanged="(string e) => ExternalFilter(e)" UpdateOnInput="true" />
-            <BSButton OnClick="DeleteActiveCookies" Color="BSColor.Primary">Delete</BSButton>
+            <BSInput @ref="selectDomain" InputType="InputType.Text" placeholder="Select by domain" Value="cc._customFilter" ValueChanged="(string e) => ExternalFilter(e)" UpdateOnInput="true" />
+            <BSButton Target="modal02" Color="BSColor.Primary" IsDisabled="cc._customFilter == string.Empty">Delete</BSButton>
         </div>
-            
 
         <BSDataTable Items="cc._cookies"
                      TotalItems="cc._count"
@@ -39,9 +51,11 @@
                 <BSDataTableHead TValue="CookieItem" Sortable="true" Column="@(nameof(CookieItem.CookieDomain))">Domain</BSDataTableHead>
                 <BSDataTableHead TValue="CookieItem" Sortable="true" Column="@(nameof(CookieItem.CookieExpiryDate))">Expiry Date</BSDataTableHead>
             </Header>
+
             <NoData>
                 <BSLabel style="color:red;">No cookies. Did you click the "Get All Cookies" button?</BSLabel>
             </NoData>
+
             <Body>
                 <BSDataTableRow>
                     <BSTD>
@@ -59,6 +73,7 @@
         </BSDataTable>
 
     </Content>
+
     <Footer>
         <BSButton Target="modal01">Close</BSButton>        
         <BSButton OnClick="ClickGetCookiesHandler" Color="BSColor.Primary">Get All Cookies</BSButton>
@@ -66,11 +81,18 @@
 
 </BSModal>
 
+@* Confirmation modal popup *@
+<BSModal     
+    @ref="Popup" 
+    DataId="modal02" 
+    IsCentered="true" 
+    IsStaticBackdrop=true 
+    ShowBackdrop=true 
+    Size="Size.Medium">
 
-<BSModal @ref="Popup" DataId="modal02" IsCentered="true" IsStaticBackdrop=true ShowBackdrop=false Size="Size.Small">
-    <Header>You are removing @cc._count cookies</Header>
+    <Header><h5>You are about to remove @cc._count cookies</h5></Header>
     <Content>
-        Are you sure?
+        <h6 style="color:red;">Are you sure?</h6>
     </Content>
     <Footer>
         <BSButton Target="modal02">Cancel</BSButton>
@@ -83,13 +105,16 @@
 <div class="text-center">
 <BSRow Align="Align.Center" Padding="Padding.Small">
     <BSCol>
-        <BSButton Color="BSColor.Success" OnClick="LaunchModal">OK, Lets Go!'</BSButton>
+        <BSButton Target="modal01" Color="BSColor.Success">OK, Lets Go!</BSButton>
     </BSCol>
 </BSRow>
 </div>
 
 
 @code {
+
+    // ---------------------------------------------------------->>> Parameters
+    // Parameters passed by index razor component
 
     [Parameter]
     public CookiesClass cc { get; set; }
@@ -106,50 +131,49 @@
     [Parameter]
     public EventCallback<int> ExternalRemoveCookies { get; set; }
 
+    // the modals
     private static BSModal Modal { get; set; } = new BSModal();
     private static BSModal Popup { get; set; } = new BSModal();
 
-    private static string content { get; set; }
+    private BSInput<string> selectDomain = new BSInput<string>();
+
+    // ---------------------------------------------------------->>> Functions & Methods
 
     /// <summary>
     /// Gets the cookies
     /// </summary>
     private async void ClickGetCookiesHandler()
     {
-        await ClearGrid();
+        await cc.ClearGrid();
         await ExternalGetCookies.InvokeAsync(0);
 
-        content = $"{cc.data.Count()} active cookies";
+        //content = $"{cc.data.Count()} active cookies";
         StateHasChanged();
     }
 
     /// <summary>
-    /// Shows the modal cookies grid
+    /// Starts removing cookies
     /// </summary>
     /// <returns></returns>
-    private async Task LaunchModal()
-    {
-        await Modal.ShowAsync();
-    }
-
-    private async Task DeleteActiveCookies()
-    {
-        await Popup.ShowAsync();
-    }
-
     private async Task RemoveCookies()
     {
         await Popup.HideAsync();
         await ExternalRemoveCookies.InvokeAsync(0);
+        StateHasChanged();
     }
 
-    private async Task ClearGrid()
+    private async Task ClearCookieGrid()
     {
-        cc.data.Clear();
-        cc._count = 0;
-        cc.CustomFilter("");
-        await cc._customFilterRef.Refresh();
-        content = string.Empty;
+        await cc.ClearGrid();
+        try
+        {
+            await selectDomain.Element.Value.FocusAsync();
+        }
+        catch(Exception ex)
+        {
+            await js.InvokeVoidAsync("console.log", $"selectDomain error: {ex.Message}");
+        }
+
         StateHasChanged();
     }
 }

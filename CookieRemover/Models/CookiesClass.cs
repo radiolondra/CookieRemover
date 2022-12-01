@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CookieExtension.Models
 {
@@ -15,6 +16,9 @@ namespace CookieExtension.Models
         public int _count { get; set; } = 0;
         public IEnumerable<CookieItem> _cookies { get; set; }
         public int ItemsPerPage { get; set; } = 20;
+
+        public string content { get; set; } = string.Empty;
+        public string selected { get; set; } = string.Empty;
 
         public CookiesClass(int IPP, int SP)
         {
@@ -54,7 +58,6 @@ namespace CookieExtension.Models
             {
                 _cookies = data.Skip(dataRequest.Page * ItemsPerPage).Take(ItemsPerPage);
             }
-            
         }
         public void CustomFilter(string e)
         {
@@ -64,12 +67,31 @@ namespace CookieExtension.Models
             {
                 _cookies = data.Where(q => q.CookieDomain.ToLower().Contains(_customFilter.ToLower()) ).ToList();
                 _count = _cookies.Count();
+                selected = $"Selected: {_count}";
             }
             else
             {
                 _cookies = data.Take(ItemsPerPage);
                 _count = _cookies.Count();
-            }            
+                selected = "";
+            }
+
+            
+            
+        }
+
+        /// <summary>
+        /// Resets the cookies grid
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearGrid()
+        {
+            data.Clear();
+            _count = 0;
+            CustomFilter("");            
+            content = string.Empty;
+            selected = string.Empty;
+            await _customFilterRef.Refresh();
         }
     }
 }

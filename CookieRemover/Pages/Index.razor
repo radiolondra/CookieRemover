@@ -9,29 +9,31 @@
         <BSCol>
             <h2 style="text-align:center; color:darkblue;">Hi, so today you want to delete some cookies, eh?</h2>
         </BSCol>
-    </BSRow>    
-    
+    </BSRow>
+
     @* Insert CookiesGrid component *@
-    <CookiesGrid 
-                 cc="@cc"
+    <CookiesGrid cc="@cc"
                  ExternalChange="@OnChange"
                  ExternalFilter="@CustomFilter"
                  ExternalGetCookies="@GetAllBrowserCookiesWE"
-                 ExternalRemoveCookies="@RemoveCookies"
-    >
-    </CookiesGrid>    
+                 ExternalRemoveCookies="@RemoveCookies">
+    </CookiesGrid>
 
 </BSContainer>
 
 @code {
-    
+
     private static string filter { get; set; }
 
-    public static CookiesClass cc = new CookiesClass(20, 0);    
+    public static CookiesClass cc = new CookiesClass(20, 0);
 
+
+    /// <summary>
+    /// Get all browser cookies
+    /// </summary>
+    /// <returns></returns>
     public async Task GetAllBrowserCookiesWE()
     {
-
         WebExtensions.Net.Cookies.GetAllDetails details = new();
 
         /*
@@ -46,8 +48,8 @@
         details.StoreId = null;
         */
 
+        // Gets all cookies
         var cookiesWE = await WebExtensions.Cookies.GetAll(details);
-
 
         foreach (WebExtensions.Net.Cookies.Cookie cookie in cookiesWE)
         {
@@ -69,10 +71,13 @@
             cc.data.Add(ci);
         }
 
+        // sort by Name
         cc.data = cc.data.OrderBy<CookieItem, string>(l => l.CookieName).ToList();
 
         cc._count = cc.data.Count();
-        cc._cookies = cc.data.Skip(cc._startPage * cc.ItemsPerPage).Take(cc.ItemsPerPage);        
+        cc._cookies = cc.data.Skip(cc._startPage * cc.ItemsPerPage).Take(cc.ItemsPerPage);
+
+        cc.content = $"Total: {cc.data.Count()}";
     }
 
     /// <summary>
@@ -112,21 +117,16 @@
 
                 try
                 {
-                    await WebExtensions.Cookies.Remove(details);                   
+                    await WebExtensions.Cookies.Remove(details);
                 }
                 catch
                 {
                     ;
                 }
-
-                
             }
         }
 
-        cc.data.Clear();
-        cc._count = 0;
-        cc.CustomFilter("");
-        await cc._customFilterRef.Refresh();
+        await cc.ClearGrid();
 
         StateHasChanged();
     }
