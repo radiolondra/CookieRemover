@@ -1,6 +1,6 @@
 # CookieRemover
 
-Remove cookies by domain
+Remove cookies by domain. Still in development.
 
 Browser extension built in C# (Blazor) and Javascript
 
@@ -24,5 +24,5 @@ Visual Studio 2022 with .Net 7 is required to compile the extension.
 
 ### Note
 
-There is an error in Chromium that I [found and reported to the Chromium development team](https://bugs.chromium.org/p/chromium/issues/detail?id=1385796), which fails to instantiate WASM using manifest V3. On some web pages the extension generates the error:
+There is an error in Chromium that I [found and has been reported to the Chromium development team](https://bugs.chromium.org/p/chromium/issues/detail?id=1385796), which fails to instantiate WASM using manifest V3. On some web pages the extension generates the error:
  `"Uncaught (in promise) CompileError: WebAssembly.instantiateStreaming(): ..."` This is due to the fact that Chromium, in some web pages, wrongly uses the CSP of the page instead of the CSP of the extension. The Chromium development team is working to correct the problem.
